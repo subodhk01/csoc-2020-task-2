@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}
+    Signup | Library
+{% endblock %}
+
+{% block form %}
+    <div><h1>Signup</h1></div>
+    <form action="" method="POST">
+        {% csrf_token %}
+        <div class="row">
+            <div class="form-group col-6">
+                <label>Enter Firstname</label>
+                <input class="form-control" type="text" name="firstname" id="inputFirstname" required/>
+            </div> 
+            <div class="form-group col-6">
+                <label>Enter Lastname</label>
+                <input class="form-control" type="text" name="lastname" id="inputLastname" required/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Enter Email</label>
+            <input class="form-control" type="email" name="email" id="inputEmail" required/>
+        </div>
+        <div class="form-group">
+            <label>Enter Username</label>
+            <input class="form-control" type="text" name="username" id="inputUsername" required/>
+        </div> 
+        <div class="form-group">
+            <label>Enter Password</label>
+            <input class="form-control" type="password" name="password1" id="inputPassword1" required/>
+        </div> 
+        <div class="form-group">
+            <label>Enter Password Again</label>
+            <input class="form-control" type="password" name="password2" id="inputPassword2" required/>
+        </div>  
+        <br>
+        <input class="form-control btn btn-info" id="submitButton" onclick="signupformsubmit()" value="Submit" type="submit">
+        <div class="error">{% if msg %}{{msg}}{% endif %}</div>
+    </form>
+{% endblock %}
