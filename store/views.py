@@ -21,7 +21,14 @@ def bookDetailView(request, bid):
     context = {
         'book': book, # set this to an instance of the required book
         'num_available': count, # set this to the number of copies of the book available, or 0 if the book isn't available
+        'user_rating':0
     }
+    if request.user.is_authenticated:
+        user_rating = book.user_ratings.get(str(request.user))
+        print(user_rating)
+        print(type(user_rating))
+        if user_rating :
+            context['user_rating'] = user_rating
     return render(request, template_name, context=context)
 
 
@@ -55,13 +62,13 @@ def viewLoanedBooks(request):
     return render(request, template_name, context=context)
 
 @csrf_exempt
-@login_required
 def loanBookView(request):
     '''
     Check if an instance of the asked book is available.
     If yes, then set the message to 'success', otherwise 'failure'
     '''
-    # START YOUR CODE HERE
+    if not request.user.is_authenticated:
+        return JsonResponse({ "message": "You must be logged in to loan book" })
     book_id = request.POST['bid'] # get the book id from post data
     books = BookCopy.objects.filter(book_id__exact=book_id, status__exact=True)
     if books:
@@ -72,7 +79,7 @@ def loanBookView(request):
         book.save()
         message = "success"
     else:
-        message = "faliure"
+        message = "No books available to loan"
     response_data = {
         'message': message,
     }
@@ -107,17 +114,12 @@ def rateBookview(request, bid):
     if request.method == "POST":
         book = Book.objects.get(pk=bid)
         rating = request.POST['rating']
-        print(book.user_ratings)
-        print(str(request.user))
         book.user_ratings[str(request.user)] = rating
         book.save()
         rating_sum = 0
         for key in book.user_ratings:
             print(key,book.user_ratings[key])
             rating_sum += int(book.user_ratings[key])
-        print("rating sum: ",rating_sum)
-        print("rating: ",book.rating)
-        print(len(book.user_ratings))
         book.rating = rating_sum/len(book.user_ratings)
         book.save()
         return redirect('/book/'+str(bid))

@@ -15,7 +15,7 @@
     <dt>Description:</dt>
     <dd>{{ book.description }}</dd>
     <dt>Rating:</dt>
-    <dd>{{ book.rating }}</dd>
+    <dd>{{ book.rating|floatformat:2 }}</dd>
     <dt>MRP:</dt>
     <dd>Rs. {{ book.mrp }}</dd>
     <dt>Available Copies:</dt>
@@ -26,7 +26,7 @@
 	{% csrf_token %}
 	<label>Rate Book: </label>
 	<select name="rating">
-		<option value="" hidden selected>{{book.rating}}</option>
+		<option value="{{user_rating}}" hidden selected>{{user_rating}}</option>
 		<option value="0">0</option>
 		<option value="1">1</option>
 		<option value="2">2</option>
@@ -41,30 +41,36 @@
 	</select>
 	<button type="submit">Rate</button>
 </form>
-{% endif %}
 <button class="btn btn-primary" id="loan-button">Loan {{ book.title }}</button>
+{% else %}
+(Log in to Loan or Rate Books)
+{% endif %}
 <script>
 $("#loan-button").click(function(){
-    $.ajax({
-		url: "{% url 'loan-book' %}",
-		method: "POST",
-		data: {
-			bid: {{ book.id }}
-		},
-		success: function(data, status, xhr){
-			if(data['message'] == "success"){
-                alert("Book successfully issued");
-                window.location.replace("/books/loaned");
+	if( {{num_available}} ){
+		$.ajax({
+			url: "{% url 'loan-book' %}",
+			method: "POST",
+			data: {
+				bid: {{ book.id }}
+			},
+			success: function(data, status, xhr){
+				if(data['message'] == "success"){
+					alert("Book successfully issued");
+					window.location.replace("/books/loaned");
+				}
+				else{
+					alert(data['message']);
+				}
+			},
+			error: function(xhr, status, err){
+				alert("Some error occured");
 			}
-			else{
-				alert("Unable to issue this book");
-			}
-		},
-		error: function(xhr, status, err){
-			alert("Some error occured");
-		}
 
-	})
+		})
+	}else{
+		alert('No books available to loan, sorry :-(');
+	}
 })
 </script>
 {% endblock %}
