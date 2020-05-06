@@ -4,8 +4,7 @@
 {% endblock %}
 
 {% block form %}
-    <div><h1>Login</h1></div>
-    <form action="" method="POST" style="max-width: 300px;">
+    <form action="" method="POST" id="loginForm">
         {% csrf_token %}
         <div class="form-group">
             <label>Username</label>
@@ -16,7 +15,7 @@
             <input class="form-control" type="password" name="password" id="inputPassword" required/>
         </div> 
         <br>
-        <input class="form-control btn btn-info" id="submitButton" onclick="loginformsubmit()" value="Submit" type="submit">
+        <input class="form-control btn btn-info" id="submitButton" value="Submit" type="submit">
         <div class="error">{% if msg %}{{msg}}{% endif %}</div>
     </form>
 {% endblock %}

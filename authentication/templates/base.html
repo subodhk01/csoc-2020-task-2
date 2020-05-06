@@ -11,16 +11,94 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-        <link rel="stylesheet" href="{% static 'auth/css/index.css' %}">
-        <script src="{% static 'auth/js/main.js' %}"></script>
+        <style>
+            html,body {
+                width: 100%;
+                height: 100%;
+            }
+            .formbox-container {
+                width: 100%;
+                min-height: 100%;
+                display: flex;
+                align-items: center;
+                padding: 20px;
+            }
+            .formbox {
+                margin: auto;
+                padding: 25px;
+                border-radius: 10px;
+                border: 1px solid rgb(204, 201, 201);
+                box-shadow: 0px 0px 6px -3px rgba(0,0,0,.2), 0px 0px 10px -3px rgb(241, 239, 239);
+                max-width: 500px;
+            }
+            .formbox>div {
+                text-align: center;
+            }
+            .error {
+                font-size: 0.8rem;
+                text-align: center;
+                margin-top: 10px;
+                color: rgb(187, 31, 31);
+            }
+        </style>
     </head>
     <body>
         <div class="formbox-container">
-            <div class="formbox col-xs-12 col-sm-12 col-md-7 col-lg-5">
+            <div class="formbox">
                 {% block form %}
                     Nothing to view here
                 {% endblock %}
             </div> 
         </div>
+
+        <script>
+            $('#loginForm').submit(function(e){
+                $('.error').html("...");
+                username = document.getElementById("inputUsername").value.trim();
+                password = document.getElementById("inputPassword").value;
+                if(username==="" || password===""){
+                    e.preventDefault();
+                    setInterval(
+                        function(){
+                            $('.error').html("No fields should be empty");
+                        }
+                        ,500);
+                    console.log('empty fields.')
+                }else {
+                    return;
+                }
+            });
+            $('#signupForm').submit(function(e){
+                $('.error').html("...");
+                username = document.getElementById("inputUsername").value.trim();
+                firstname = document.getElementById("inputFirstname").value.trim();
+                lastname = document.getElementById("inputLastname").value.trim();
+                email = document.getElementById("inputEmail").value.trim();
+                password1 = document.getElementById("inputPassword1").value;
+                password2 = document.getElementById("inputPassword2").value;
+                if(username==="" || password1==="" || password2==="" || email==="" || firstname==="" || lastname===""){
+                    e.preventDefault();
+                    setInterval(
+                        function(){
+                            $('.error').html("No fields should be empty");
+                        }
+                        ,500);
+                    console.log('empty fields.')
+                }else {
+                    if( password1 != password2 ){
+                        e.preventDefault();
+                        setInterval(
+                            function(){
+                                $('.error').html("Passwords do not match.");
+                            }
+                            ,500);
+                        console.log('Passwords do not match')
+                    }else{
+                        $('.error').html("...");
+                        return;
+                    }
+                }
+            });
+        </script>
     </body>
 </html>

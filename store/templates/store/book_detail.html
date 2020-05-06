@@ -15,17 +15,15 @@
     <dt>Description:</dt>
     <dd>{{ book.description }}</dd>
     <dt>Rating:</dt>
-    <dd>{{ book.rating|floatformat:2 }}</dd>
+    <dd id="rating">{{ book.rating|floatformat:2 }}</dd>
     <dt>MRP:</dt>
     <dd>Rs. {{ book.mrp }}</dd>
     <dt>Available Copies:</dt>
     <dd>{{ num_available }}</dd>
 </dl>
 {% if user.is_authenticated %}
-<form action="/book/rating/{{book.id}}" method="POST">
-	{% csrf_token %}
 	<label>Rate Book: </label>
-	<select name="rating">
+	<select name="rating" id="ratingDropdown">
 		<option value="{{user_rating}}" hidden selected>{{user_rating}}</option>
 		<option value="0">0</option>
 		<option value="1">1</option>
@@ -39,38 +37,66 @@
 		<option value="9">9</option>
 		<option value="10">10</option>
 	</select>
-	<button type="submit">Rate</button>
-</form>
+	<button type="submit" id="ratingSubmit">Rate</button><br>
 <button class="btn btn-primary" id="loan-button">Loan {{ book.title }}</button>
 {% else %}
 (Log in to Loan or Rate Books)
 {% endif %}
 <script>
-$("#loan-button").click(function(){
-	if( {{num_available}} ){
-		$.ajax({
-			url: "{% url 'loan-book' %}",
-			method: "POST",
-			data: {
-				bid: {{ book.id }}
-			},
-			success: function(data, status, xhr){
-				if(data['message'] == "success"){
-					alert("Book successfully issued");
-					window.location.replace("/books/loaned");
+	var rating = {{user_rating}};
+	$('#ratingSubmit').click(function(){
+		if ($('#ratingDropdown option:selected').text() == rating ){
+			alert('Select a different rating to sumbit');
+		} else {
+			$.ajax({
+				url: "{% url 'rate-book' book.id %}",
+				method: "POST",
+				data: {
+					bid: {{ book.id }},
+					rating: $('#ratingDropdown').val()
+				},
+				success: function(data, status, xhr){
+					if(data['message'] == "success"){
+						$('#rating').html(data['rating'].toFixed(2));
+						alert('Book rated successfully')
+					}
+					else{
+						alert(data['message']);
+					}
+				},
+				error: function(xhr, status, err){
+					alert("Some error occured");
 				}
-				else{
-					alert(data['message']);
-				}
-			},
-			error: function(xhr, status, err){
-				alert("Some error occured");
-			}
+	
+			});
+		}
+	});
 
-		})
-	}else{
-		alert('No books available to loan, sorry :-(');
-	}
-})
+	$("#loan-button").click(function(){
+		if( {{num_available}} ){
+			$.ajax({
+				url: "{% url 'loan-book' %}",
+				method: "POST",
+				data: {
+					bid: {{ book.id }}
+				},
+				success: function(data, status, xhr){
+					if(data['message'] == "success"){
+						alert("Book successfully issued");
+						window.location.replace("/books/loaned");
+					}
+					else{
+						alert(data['message']);
+					}
+				},
+				error: function(xhr, status, err){
+					alert("Some error occured");
+				}
+
+			})
+		}else{
+			alert('No books available to loan, sorry :-(');
+		}
+	})
 </script>
 {% endblock %}

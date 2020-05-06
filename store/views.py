@@ -109,6 +109,7 @@ def returnBookView(request):
     else:
         return JsonResponse( {"message":"Bad Request"} )
 
+@csrf_exempt
 @login_required
 def rateBookview(request, bid):
     if request.method == "POST":
@@ -122,8 +123,8 @@ def rateBookview(request, bid):
             rating_sum += int(book.user_ratings[key])
         book.rating = rating_sum/len(book.user_ratings)
         book.save()
-        return redirect('/book/'+str(bid))
+        return JsonResponse( {"message":"success", 'rating':book.rating} )
     else:
-        return HttpResponse("Bad Request")
+        return JsonResponse( {"message":"Unable to Rate Book"} )
 
 
